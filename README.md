@@ -26,7 +26,7 @@
 
 Misi kami sederhana: menghilangkan hambatan dalam pembuatan materi pemasaran yang profesional. Cukup dengan mengunggah foto produk, pemilik usaha dapat langsung menerima beberapa pilihan *caption* pemasaran yang terstruktur dan menarik dalam hitungan detik.
 
-Proyek ini menggunakan kombinasi model AI yang kuat, termasuk **Gemini Flash 2.5** untuk pemrosesan cepat dan **ColossalAI GLM 4.6** untuk analisis gambar mendalam, memastikan konten yang dihasilkan relevan dan berkualitas tinggi.
+Proyek ini menggunakan kombinasi model AI yang kuat, termasuk **ColossalAI GLM 4.6** untuk pemrosesan cepat dan **Gemini Flash 2.5** untuk analisis gambar mendalam, memastikan konten yang dihasilkan relevan dan berkualitas tinggi.
 
 ## ✨ Fitur Utama
 
@@ -124,10 +124,14 @@ Kami sangat menyambut kontribusi dari komunitas\! Jika Anda seorang **UMKM**, **
 4.  *Push* ke *branch* (`git push origin fitur/NamaFiturBaru`).
 5.  Buka *Pull Request* baru (PR) dan jelaskan perubahan yang Anda buat.
 
+## 🙏 Terima Kasih
+   **IMPHNEN X KOLOSAL** atas kesempatan hackathon ini.
+   **GoogleGemini & Kolosal AI** untuk penyediaan API yang hebat.
+   Semua kontributor yang telah membantu mengembangkan proyek ini.
 ## 📄 Lisensi
 
 Proyek ini dilisensikan di bawah **Lisensi MIT**. Lihat file [`LICENSE`](https://www.google.com/search?q=LICENSE) untuk detail lebih lanjut.
 
 -----
 
-*Dibuat dengan ❤️ untuk kemajuan UMKM Indonesia.*
+*Dibuat oleh azhar & aunu (NCHMPK) ❤️ untuk kemajuan UMKM Indonesia.*

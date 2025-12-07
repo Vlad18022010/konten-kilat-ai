@@ -7,25 +7,424 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
-      /* Custom scrollbar for generated content */
-      .prose::-webkit-scrollbar {
-        width: 8px;
-      }
-      .prose::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      .prose::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-      }
-      .prose::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-      }
-    </style>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Custom scrollbar untuk konten hasil */
+  .prose::-webkit-scrollbar {
+    width: 8px;
+  }
+  .prose::-webkit-scrollbar-track {
+    background: #0b1220;
+  }
+  .prose::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+  }
+  .prose::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  /* =========================================
+     THEME BASE
+     heaven-mode  = terang (surga)
+     hell-mode    = gelap (neraka)
+     ========================================= */
+  body.heaven-mode {
+    background-color: #f4f4fb;
+    color: #0f172a;
+  }
+
+  body.hell-mode {
+    background-color: #020617;
+    color: #e5e7eb;
+  }
+
+  .animated-bg {
+    position: relative;
+    overflow: hidden;
+    transition: background 0.6s ease, color 0.6s ease;
+  }
+
+  /* ---------- Heaven (Light) ---------- */
+  body.heaven-mode .animated-bg {
+    background-image: linear-gradient(
+      140deg,
+      #eff6ff,
+      #e0f2fe,
+      #fef3c7,
+      #fee2e2
+    );
+    background-size: 220% 220%;
+    animation: gradientFlow 24s ease-in-out infinite;
+  }
+
+  body.heaven-mode .animated-bg::before,
+  body.heaven-mode .animated-bg::after {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    pointer-events: none;
+  }
+
+  body.heaven-mode .animated-bg::before {
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129, 140, 248, 0.35) 0, transparent 55%),
+      radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.35) 0, transparent 55%),
+      radial-gradient(circle at 0% 100%, rgba(251, 191, 36, 0.25) 0, transparent 55%),
+      radial-gradient(circle at 100% 100%, rgba(248, 113, 113, 0.25) 0, transparent 55%);
+    mix-blend-mode: soft-light;
+    filter: blur(10px);
+    opacity: 0.95;
+    animation: auroraDrift 28s ease-in-out infinite alternate;
+  }
+
+  body.heaven-mode .animated-bg::after {
+    background:
+      radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.9) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 30% 80%, rgba(255, 255, 255, 0.8) 0, transparent 60%),
+      radial-gradient(1.2px 1.2px at 70% 30%, rgba(255, 255, 255, 0.75) 0, transparent 55%),
+      radial-gradient(1px 1px at 90% 60%, rgba(255, 255, 255, 0.85) 0, transparent 60%),
+      radial-gradient(1px 1px at 50% 10%, rgba(255, 255, 255, 0.7) 0, transparent 55%);
+    opacity: 0.7;
+    animation: starParallax 38s linear infinite;
+  }
+
+  /* ---------- Hell (Dark) ---------- */
+  body.hell-mode .animated-bg {
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(127, 29, 29, 0.9), transparent 55%),
+      radial-gradient(circle at 100% 0%, rgba(153, 27, 27, 0.9), transparent 55%),
+      radial-gradient(circle at 0% 100%, rgba(30, 64, 175, 0.9), transparent 55%),
+      radial-gradient(circle at 100% 100%, rgba(88, 28, 135, 0.9), transparent 55%),
+      linear-gradient(145deg, #020617, #111827, #1f2937);
+    background-size: 260% 260%;
+    animation: infernoFlow 30s ease-in-out infinite;
+  }
+
+  body.hell-mode .animated-bg::before,
+  body.hell-mode .animated-bg::after {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    pointer-events: none;
+  }
+
+  body.hell-mode .animated-bg::before {
+    background:
+      radial-gradient(circle at 10% 0%, rgba(248, 113, 113, 0.28) 0, transparent 55%),
+      radial-gradient(circle at 90% 20%, rgba(239, 68, 68, 0.3) 0, transparent 55%),
+      radial-gradient(circle at 0% 100%, rgba(249, 115, 22, 0.32) 0, transparent 55%),
+      radial-gradient(circle at 100% 90%, rgba(234, 88, 12, 0.28) 0, transparent 55%);
+    mix-blend-mode: screen;
+    filter: blur(12px);
+    opacity: 0.95;
+    animation: magmaDrift 26s ease-in-out infinite alternate;
+  }
+
+  body.hell-mode .animated-bg::after {
+    background:
+      radial-gradient(1px 1px at 20% 20%, rgba(252, 211, 77, 0.9) 0, transparent 60%),
+      radial-gradient(1.2px 1.2px at 40% 70%, rgba(248, 113, 113, 0.8) 0, transparent 60%),
+      radial-gradient(1.1px 1.1px at 70% 30%, rgba(251, 146, 60, 0.85) 0, transparent 60%),
+      radial-gradient(1px 1px at 85% 80%, rgba(248, 250, 252, 0.7) 0, transparent 60%);
+    opacity: 0.7;
+    mix-blend-mode: screen;
+    animation: emberDrift 18s linear infinite;
+  }
+
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  @keyframes auroraDrift {
+    0% {
+      transform: translate3d(-6%, -4%, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(4%, 6%, 0) scale(1.05);
+    }
+    100% {
+      transform: translate3d(-3%, 4%, 0) scale(1.02);
+    }
+  }
+
+  @keyframes starParallax {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-6%, 4%, 0);
+    }
+  }
+
+  @keyframes infernoFlow {
+    0% {
+      background-position: 0% 100%;
+    }
+    50% {
+      background-position: 100% 0%;
+    }
+    100% {
+      background-position: 0% 100%;
+    }
+  }
+
+  @keyframes magmaDrift {
+    0% {
+      transform: translate3d(4%, -4%, 0) scale(1.05);
+    }
+    50% {
+      transform: translate3d(-4%, 4%, 0) scale(1.02);
+    }
+    100% {
+      transform: translate3d(2%, -2%, 0) scale(1.06);
+    }
+  }
+
+  @keyframes emberDrift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(8%, -10%, 0);
+    }
+  }
+
+  /* Typography & cards */
+  .neon-title {
+    text-shadow:
+      0 0 10px rgba(59, 130, 246, 0.5),
+      0 0 30px rgba(129, 140, 248, 0.7);
+    animation: neonPulse 4s ease-in-out infinite alternate;
+  }
+
+  body.hell-mode .neon-title {
+    text-shadow:
+      0 0 10px rgba(239, 68, 68, 0.9),
+      0 0 30px rgba(248, 113, 113, 0.9);
+  }
+
+  @keyframes neonPulse {
+    0% {
+      text-shadow:
+        0 0 6px rgba(59, 130, 246, 0.5),
+        0 0 16px rgba(129, 140, 248, 0.6);
+    }
+    100% {
+      text-shadow:
+        0 0 14px rgba(59, 130, 246, 0.9),
+        0 0 32px rgba(129, 140, 248, 1);
+    }
+  }
+
+  .subtitle-glow {
+    text-shadow: 0 2px 8px rgba(15, 23, 42, 0.16);
+    animation: subtitleGlow 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes subtitleGlow {
+    0% {
+      opacity: 0.8;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+  }
+
+  .glass-card {
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    background-image:
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.14), transparent 55%);
+  }
+
+  body.hell-mode .glass-card {
+    background-image:
+      radial-gradient(circle at top left, rgba(248, 113, 113, 0.18), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(30, 64, 175, 0.26), transparent 55%);
+    box-shadow:
+      0 18px 45px rgba(15, 23, 42, 0.75),
+      0 0 40px rgba(248, 113, 113, 0.35);
+  }
+
+  body.hell-mode .glass-card .text-gray-600,
+  body.hell-mode .glass-card .text-gray-500,
+  body.hell-mode .glass-card .text-gray-400,
+  body.hell-mode .glass-card .text-gray-700,
+  body.hell-mode .glass-card .text-slate-600,
+  body.hell-mode .glass-card .text-slate-500,
+  body.hell-mode .glass-card .text-slate-400,
+  body.hell-mode .glass-card .text-slate-700 {
+    color: #e5e7eb;
+  }
+
+  .settings-float {
+    transition: color 180ms ease, text-shadow 180ms ease;
+  }
+
+  .settings-float:hover {
+    text-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
+  }
+
+  .settings-spin svg {
+    transition: transform 200ms ease;
+    transform-origin: center;
+  }
+
+  .settings-spin:hover svg {
+    animation: spinGear 0.8s linear infinite;
+  }
+
+  .settings-spin:active svg {
+    transform: scale(0.9);
+  }
+
+  @keyframes spinGear {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .theme-toggle {
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .theme-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.28);
+  }
+
+  .typing-credit {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 2px solid rgba(148, 163, 184, 0.9);
+    animation:
+      typing-credit 5s steps(30, end) infinite,
+      blink-credit 0.8s step-end infinite;
+  }
+
+  @keyframes typing-credit {
+    0% {
+      width: 0;
+    }
+    40% {
+      width: 28ch;
+    }
+    60% {
+      width: 28ch;
+    }
+    100% {
+      width: 0;
+    }
+  }
+
+  @keyframes blink-credit {
+    from,
+    to {
+      border-color: transparent;
+    }
+    50% {
+      border-color: rgba(148, 163, 184, 0.9);
+    }
+  }
+
+  .settings-panel {
+    animation: panelIn 220ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    transform-origin: top right;
+  }
+
+  @keyframes panelIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  .primary-cta {
+    background-image: linear-gradient(135deg, #0f172a, #1d4ed8, #a855f7);
+    background-size: 220% 220%;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.45);
+  }
+
+  body.heaven-mode .primary-cta:hover {
+    animation: ctaGlow 6s ease-in-out infinite;
+  }
+
+  body.hell-mode .primary-cta {
+    background-image: linear-gradient(135deg, #7f1d1d, #ea580c, #f97316);
+    box-shadow:
+      0 18px 55px rgba(0, 0, 0, 0.95),
+      0 0 40px rgba(248, 113, 113, 0.6);
+  }
+
+  body.hell-mode .primary-cta:hover {
+    animation: infernoGlow 5s ease-in-out infinite;
+  }
+
+  @keyframes ctaGlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes infernoGlow {
+    0% {
+      background-position: 0% 40%;
+    }
+    50% {
+      background-position: 100% 60%;
+    }
+    100% {
+      background-position: 0% 40%;
+    }
+  }
+
+  .floating-empty {
+    animation: floatCard 6s ease-in-out infinite;
+  }
+
+  @keyframes floatCard {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+</style>
   <script type="importmap">
 {
   "imports": {
@@ -36,6 +435,7 @@
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-slate-50 text-slate-900 antialiased">
     <div id="root"></div>

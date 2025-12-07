@@ -9,6 +9,8 @@ const App: React.FC = () => {
   const [kolosalKey, setKolosalKey] = useState<string>('');
   const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
   const [showSaveConfirmation, setShowSaveConfirmation] = useState<boolean>(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
   const [state, setState] = useState<AnalysisState>({
     status: 'idle',
     imageSrc: null,
@@ -17,11 +19,28 @@ const App: React.FC = () => {
     error: null,
   });
 
-  // Load Kolosal key from storage on mount
+  // Load Kolosal key on mount
   useEffect(() => {
     const savedKey = localStorage.getItem('KOLOSAL_API_KEY');
     if (savedKey) setKolosalKey(savedKey);
+
+    const savedTheme = localStorage.getItem('KK_THEME');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      setTheme(savedTheme);
+    }
   }, []);
+
+  // Apply theme to <body>
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('hell-mode');
+      document.body.classList.remove('heaven-mode');
+    } else {
+      document.body.classList.add('heaven-mode');
+      document.body.classList.remove('hell-mode');
+    }
+    localStorage.setItem('KK_THEME', theme);
+  }, [theme]);
 
   const handleSaveKey = () => {
     localStorage.setItem('KOLOSAL_API_KEY', kolosalKey);
@@ -33,63 +52,65 @@ const App: React.FC = () => {
 
   const handleImageSelect = async (file: File) => {
     if (!kolosalKey) {
-      alert("Mohon masukkan API Key Kolosal Anda terlebih dahulu di menu pengaturan.");
+      alert('Mohon masukkan API Key Kolosal Anda terlebih dahulu di menu pengaturan.');
       setShowKeyInput(true);
       return;
     }
 
     // Reset state for new process
-    setState(prev => ({ 
-      ...prev, 
-      status: 'analyzing_image', 
-      error: null, 
+    setState(prev => ({
+      ...prev,
+      status: 'analyzing_image',
+      error: null,
       finalCopy: null,
-      imageDescription: null 
+      imageDescription: null,
     }));
 
-    // Convert to Base64
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64String = reader.result as string;
-      
+
       setState(prev => ({ ...prev, imageSrc: base64String }));
 
       try {
         // Step 1: Gemini Vision Analysis
         const description = await analyzeImageWithGemini(base64String, file.type);
-        
-        setState(prev => ({ 
-          ...prev, 
+
+        setState(prev => ({
+          ...prev,
           imageDescription: description,
-          status: 'generating_copy' 
+          status: 'generating_copy',
         }));
 
         // Step 2: Kolosal AI Copywriting
         const copy = await generateMarketingCopy(description, kolosalKey);
 
-        setState(prev => ({ 
-          ...prev, 
+        setState(prev => ({
+          ...prev,
           finalCopy: copy,
-          status: 'complete' 
+          status: 'complete',
         }));
-
       } catch (err: any) {
-        setState(prev => ({ 
-          ...prev, 
-          status: 'error', 
-          error: err.message || "Terjadi kesalahan tidak terduga."
+        setState(prev => ({
+          ...prev,
+          status: 'error',
+          error: err?.message || 'Terjadi kesalahan tidak terduga.',
         }));
       }
     };
+
     reader.readAsDataURL(file);
   };
 
   const prepareContentForShare = (rawText: string) => {
-    const appPromo = "\n\n✨ Dibuat dengan Konten Kilat AI - Coba sekarang!";
+    const appPromo = '\n\n✨ Dibuat dengan Konten Kilat AI - Coba sekarang!';
     return rawText.trim() + appPromo;
   };
 
-  const handleShare = (platform: 'twitter' | 'facebook' | 'linkedin' | 'tiktok' | 'instagram', content: string) => {
+  const handleShare = (
+    platform: 'twitter' | 'facebook' | 'linkedin' | 'tiktok' | 'instagram',
+    content: string
+  ) => {
     const finalContent = prepareContentForShare(content);
     const textEncoded = encodeURIComponent(finalContent);
     const urlEncoded = encodeURIComponent(window.location.href);
@@ -110,12 +131,12 @@ const App: React.FC = () => {
         break;
       case 'instagram':
         navigator.clipboard.writeText(finalContent);
-        alert("Teks telah disalin! Mengarahkan ke Instagram...");
+        alert('Teks telah disalin! Mengarahkan ke Instagram...');
         window.open('https://www.instagram.com/', '_blank');
         break;
       case 'tiktok':
         navigator.clipboard.writeText(finalContent);
-        alert("Teks telah disalin! Mengarahkan ke TikTok...");
+        alert('Teks telah disalin! Mengarahkan ke TikTok...');
         window.open('https://www.tiktok.com/', '_blank');
         break;
     }
@@ -124,89 +145,164 @@ const App: React.FC = () => {
   const handleCopy = (content: string) => {
     const finalContent = prepareContentForShare(content);
     navigator.clipboard.writeText(finalContent);
-    alert("Teks berhasil disalin ke clipboard!");
+    alert('Teks berhasil disalin ke clipboard!');
   };
 
   const renderMarkdown = (text: string) => {
-    if (!text || !window.marked) return { __html: text || '' };
-    return { __html: window.marked.parse(text) };
+    if (!text || !(window as any).marked) return { __html: text || '' };
+    return { __html: (window as any).marked.parse(text) };
   };
 
-  // Split content based on the delimiter set in the prompt
   const getVariations = (fullText: string | null) => {
     if (!fullText) return [];
     const delimiter = '---BATAS_VARIASI---';
     if (fullText.includes(delimiter)) {
-      return fullText.split(delimiter).map(v => v.trim()).filter(v => v.length > 0);
+      return fullText
+        .split(delimiter)
+        .map(v => v.trim())
+        .filter(v => v.length > 0);
     }
-    return [fullText]; // Fallback if AI didn't use delimiter
+    return [fullText];
   };
 
   const variations = getVariations(state.finalCopy);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-sky-50 to-violet-100 py-10 px-4 sm:px-6 lg:px-8 animated-bg">
+      <div className="max-w-5xl mx-auto relative">
         {/* Header */}
         <div className="text-center mb-10 relative">
-          <button 
-            onClick={() => setShowKeyInput(!showKeyInput)}
-            className="absolute right-0 top-0 text-gray-400 hover:text-gray-600 transition-colors"
-            title="Pengaturan API Key"
+          {/* Tombol toggle tema Surga / Neraka */}
+          <button
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            className="absolute left-0 top-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium border border-slate-200/70 bg-white/70 backdrop-blur theme-toggle shadow-sm hover:-translate-y-0.5 hover:shadow-md hover:border-sky-300 transition-all"
+            title={theme === 'light' ? 'Ganti ke mode Neraka (gelap)' : 'Ganti ke mode Surga (terang)'}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            {theme === 'light' ? (
+              <>
+                <span className="w-4 h-4 rounded-full bg-gradient-to-br from-sky-400 to-amber-300 shadow-sm" />
+                <span>Surga</span>
+              </>
+            ) : (
+              <>
+                <span className="w-4 h-4 rounded-full bg-gradient-to-br from-red-500 via-orange-500 to-yellow-400 shadow-sm" />
+                <span>Neraka</span>
+              </>
+            )}
           </button>
 
-          <h1 className="text-4xl font-bold text-slate-800 tracking-tight">
-            Konten Kilat <span className="text-blue-600">AI</span>
+          {/* Tombol Pengaturan API Key (roda) – spin tanpa delay efek float */}
+          <button
+            onClick={() => setShowKeyInput(!showKeyInput)}
+            className="absolute right-0 top-0 text-slate-400 hover:text-sky-500 settings-spin"
+            title="Pengaturan API Key"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+
+          {/* Badge / tagline kecil */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-white/70 shadow-sm border border-slate-200/60 text-xs font-medium text-sky-700">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Vision + Copywriting • Powered by AI</span>
+          </div>
+
+          {/* Judul & Subjudul */}
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 neon-title">
+            Konten Kilat{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500">
+              AI
+            </span>
           </h1>
-          <p className="mt-3 text-lg text-slate-600">
-            Ubah foto produk menjadi materi pemasaran viral dalam hitungan detik.
+          <p className="mt-4 max-w-2xl mx-auto text-base sm:text-lg text-slate-500 subtitle-glow">
+            Ubah foto produk menjadi konten pemasaran level sultan — lengkap dengan variasi caption yang siap viral di
+            semua platform.
           </p>
         </div>
 
         {/* API Key Input Panel */}
         {showKeyInput && (
-          <div className="mb-8 p-4 bg-white rounded-lg shadow-sm border border-orange-200 max-w-2xl mx-auto">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Kolosal AI API Key</label>
-            <div className="flex gap-2">
-              <input 
-                type="password" 
+          <div className="mb-8 p-4 sm:px-5 sm:py-4 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/70 max-w-2xl mx-auto glass-card settings-panel">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  Kolosal AI API Key
+                </label>
+                <p className="text-xs text-slate-500 mb-2">
+                  Kunci ini hanya disimpan di browser Anda (localStorage) dan digunakan untuk memanggil Kolosal GLM
+                  4.6.
+                </p>
+              </div>
+              {showSaveConfirmation && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1 text-[11px] font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Tersimpan
+                </span>
+              )}
+            </div>
+
+            <div className="mt-2 flex flex-col sm:flex-row gap-3">
+              <input
+                type="password"
                 value={kolosalKey}
-                onChange={(e) => setKolosalKey(e.target.value)}
-                placeholder="sk-..."
-                className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                onChange={e => setKolosalKey(e.target.value)}
+                placeholder="Masukkan API Key Kolosal AI Anda"
+                className="flex-1 w-full rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-sm text-slate-700 shadow-inner focus:border-sky-400 focus:ring-1 focus:ring-sky-300 outline-none"
               />
-              <button 
+              <button
                 onClick={handleSaveKey}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 active:scale-95 shadow-md"
               >
                 Simpan
               </button>
             </div>
-            {showSaveConfirmation && (
-              <div className="mt-2 text-sm text-green-600 font-medium animate-pulse">
-                API Key Kolosal berhasil disimpan
-              </div>
-            )}
-            <p className="text-xs text-gray-500 mt-1">Key ini disimpan secara lokal di browser Anda.</p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Upload & Preview (4 cols) */}
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Upload & Preview */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden p-6 sticky top-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div className="bg-white/80 glass-card rounded-3xl shadow-2xl overflow-hidden p-6 sticky top-8 border border-slate-100/70">
+              <h2 className="text-xl font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L9 18" />
+                </svg>
                 Upload Produk
               </h2>
-              
-              <ImageUploader 
-                imageSrc={state.imageSrc} 
+
+              <ImageUploader
+                imageSrc={state.imageSrc}
                 onImageSelected={handleImageSelect}
-                isLoading={state.status !== 'idle' && state.status !== 'complete' && state.status !== 'error'}
+                isLoading={
+                  state.status !== 'idle' &&
+                  state.status !== 'complete' &&
+                  state.status !== 'error'
+                }
               />
 
               {/* Progress Indicator */}
@@ -218,9 +314,11 @@ const App: React.FC = () => {
 
               {/* Step 1 Result: Description (Optional/Debug) */}
               {state.imageDescription && (
-                <div className="mt-6 bg-white/80 rounded-xl shadow-sm p-4 border border-blue-100">
-                  <details className="text-sm text-gray-600">
-                    <summary className="font-medium cursor-pointer text-blue-600 hover:text-blue-700">Lihat Analisis Visual Gemini</summary>
+                <div className="mt-6 bg-white/80 glass-card rounded-xl shadow-sm p-4 border border-blue-100/80">
+                  <details className="text-sm text-slate-600">
+                    <summary className="font-medium cursor-pointer text-sky-700 hover:text-sky-800">
+                      Lihat Analisis Visual Gemini
+                    </summary>
                     <p className="mt-2 p-2 bg-slate-50 rounded border border-slate-100 text-xs leading-relaxed max-h-40 overflow-y-auto">
                       {state.imageDescription}
                     </p>
@@ -230,86 +328,235 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Result (8 cols) */}
+          {/* Right Column: Result */}
           <div className="lg:col-span-7 space-y-6">
             {state.error ? (
-               <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center justify-center text-red-500 bg-red-50 border border-red-100 min-h-[400px]">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-4"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                 <p className="text-center font-medium text-lg">{state.error}</p>
-               </div>
+              <div className="bg-white/90 glass-card rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center text-red-500 bg-red-50/90 border border-red-100/90 min-h-[400px]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mb-4"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <p className="text-center font-medium text-lg">{state.error}</p>
+              </div>
             ) : variations.length > 0 && state.finalCopy ? (
               <div className="space-y-6">
-                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                      Pilihan Konten
-                    </h2>
-                    <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full">
-                      {variations.length} Variasi Tersedia
-                    </span>
-                 </div>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    Pilihan Konten
+                  </h2>
+                  <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full">
+                    {variations.length} Variasi Tersedia
+                  </span>
+                </div>
 
-                 {variations.map((variantText, idx) => (
-                   <div key={idx} className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                      <div className="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
-                        <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Opsi #{idx + 1}</span>
-                      </div>
-                      <div className="p-6">
-                        <div 
-                          className="prose prose-sm prose-slate max-w-none prose-headings:text-blue-800 prose-a:text-blue-600 mb-6"
-                          dangerouslySetInnerHTML={renderMarkdown(variantText)}
-                        />
-                        
-                        {/* Action Bar */}
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
-                          <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                             {/* Twitter */}
-                            <button onClick={() => handleShare('twitter', variantText)} className="p-2 text-slate-400 hover:text-sky-500 hover:bg-sky-50 rounded-lg transition-all" title="Share ke Twitter">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-                            </button>
-                             {/* Facebook */}
-                            <button onClick={() => handleShare('facebook', variantText)} className="p-2 text-slate-400 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all" title="Share ke Facebook">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                            </button>
-                             {/* LinkedIn */}
-                            <button onClick={() => handleShare('linkedin', variantText)} className="p-2 text-slate-400 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all" title="Share ke LinkedIn">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                            </button>
-                            <div className="w-px h-6 bg-slate-200 mx-1"></div>
-                            {/* Instagram */}
-                             <button onClick={() => handleShare('instagram', variantText)} className="p-2 text-slate-400 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all" title="Salin & Buka Instagram">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                            </button>
-                            {/* TikTok */}
-                             <button onClick={() => handleShare('tiktok', variantText)} className="p-2 text-slate-400 hover:text-black hover:bg-slate-200 rounded-lg transition-all" title="Salin & Buka TikTok">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-                            </button>
-                          </div>
-                          
-                          <button 
-                            onClick={() => handleCopy(variantText)}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium shadow-md hover:shadow-lg transform active:scale-95 duration-150"
+                {variations.map((variantText, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white/85 glass-card rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300"
+                  >
+                    <div className="bg-slate-50/80 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
+                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Opsi #{idx + 1}
+                      </span>
+                    </div>
+                    <div className="p-6">
+                      <div
+                        className="prose prose-sm prose-slate max-w-none prose-headings:text-slate-800 prose-a:text-sky-600 mb-6"
+                        dangerouslySetInnerHTML={renderMarkdown(variantText)}
+                      />
+
+                      {/* Action Bar */}
+                      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
+                        <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                          {/* Twitter */}
+                          <button
+                            onClick={() => handleShare('twitter', variantText)}
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200/80 bg-slate-50 hover:bg-sky-50 transition-all"
+                            title="Share ke Twitter"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            Salin Teks
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.2 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 4.9 4.1 9 4 0-1.4.6-4.6 4-5 1.1 0 3 .5 3 3z" />
+                            </svg>
+                          </button>
+                          {/* Facebook */}
+                          <button
+                            onClick={() => handleShare('facebook', variantText)}
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200/80 bg-slate-50 hover:bg-blue-50 transition-all"
+                            title="Share ke Facebook"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                            </svg>
+                          </button>
+                          {/* LinkedIn */}
+                          <button
+                            onClick={() => handleShare('linkedin', variantText)}
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200/80 bg-slate-50 hover:bg-blue-50 transition-all"
+                            title="Share ke LinkedIn"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                              <rect x="2" y="9" width="4" height="12" />
+                              <circle cx="4" cy="4" r="2" />
+                            </svg>
+                          </button>
+
+                          <div className="w-px h-6 bg-slate-200 mx-1" />
+
+                          {/* Instagram */}
+                          <button
+                            onClick={() => handleShare('instagram', variantText)}
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200/80 bg-slate-50 hover:bg-pink-50 transition-all"
+                            title="Salin & Buka Instagram"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect x="3" y="3" width="18" height="18" rx="4" />
+                              <circle cx="12" cy="12" r="3.5" />
+                              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                            </svg>
+                          </button>
+                          {/* TikTok */}
+                          <button
+                            onClick={() => handleShare('tiktok', variantText)}
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200/80 bg-slate-50 hover:bg-slate-200 transition-all"
+                            title="Salin & Buka TikTok"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+                            </svg>
                           </button>
                         </div>
+
+                        <button
+                          onClick={() => handleCopy(variantText)}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white primary-cta transition-transform duration-150 hover:scale-[1.02] active:scale-95"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          Salin Teks
+                        </button>
                       </div>
-                   </div>
-                 ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-xl p-6 min-h-[400px] flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 bg-gray-50/50">
+              <div className="bg-white/80 glass-card rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-gray-100 bg-gray-50/70 floating-empty min-h-[380px]">
                 {state.status === 'idle' ? (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mb-4 opacity-30"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 13v6"/><path d="M9 16l3-3 3 3"/></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="42"
+                      height="42"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mb-4 text-slate-400"
+                    >
+                      <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16" />
+                      <path d="M14 14l1-1a2 2 0 0 1 2.828 0L20 15" />
+                      <circle cx="9" cy="7" r="2" />
+                      <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </svg>
                     <p className="text-lg">Unggah gambar untuk memulai</p>
-                    <p className="text-sm mt-2 opacity-60">Hasil akan muncul di sini</p>
+                    <p className="text-sm mt-2 opacity-60">
+                      Hasil variasi konten akan muncul secara otomatis di sini.
+                    </p>
                   </>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-                    <p className="text-sm font-medium text-gray-500 animate-pulse">
+                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4" />
+                    <p className="text-sm font-medium text-slate-500 animate-pulse text-center">
                       {state.status === 'analyzing_image' && 'Sedang menganalisis detail visual...'}
                       {state.status === 'generating_copy' && 'Sedang menulis berbagai variasi konten...'}
                     </p>
@@ -319,35 +566,39 @@ const App: React.FC = () => {
             )}
           </div>
         </div>
-        
+
         {/* Info & Credits Section */}
-        <div className="mt-12 bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+        <div className="mt-12 bg-white/80 glass-card rounded-2xl shadow-lg border border-slate-200/80 p-6 md:p-8">
           <h3 className="text-lg font-bold text-slate-800 mb-4">Tentang Konten Kilat AI</h3>
           <div className="grid md:grid-cols-2 gap-8 text-sm text-slate-600">
-            <div>
-              <h4 className="font-semibold text-slate-700 mb-2">Kegunaan Aplikasi</h4>
-              <p className="leading-relaxed mb-4">
-                Aplikasi ini membantu Anda membuat caption pemasaran instan yang menarik untuk sosial media. 
-                Dengan menggabungkan kecerdasan visual (Gemini) dan kemampuan menulis kreatif (Kolosal AI), 
-                Anda tidak perlu lagi pusing memikirkan kata-kata promosi.
+            <div className="space-y-2">
+              <p>
+                Konten Kilat AI menggabungkan kemampuan analisis visual Google Gemini 2.5 Flash dengan kecerdasan
+                bahasa Kolosal GLM 4.6 untuk membuat konten pemasaran yang relevan, menarik, dan siap pakai.
+              </p>
+              <p>
+                Cukup unggah foto produk, biarkan AI membaca konteks visualnya, lalu pilih variasi caption atau naskah
+                yang paling cocok untuk brand Anda.
               </p>
             </div>
             <div>
-               <h4 className="font-semibold text-slate-700 mb-2">Cara Menggunakan</h4>
-               <ol className="list-decimal list-inside space-y-1 leading-relaxed">
-                 <li>Klik ikon pengaturan (pojok kanan atas) dan masukkan API Key Kolosal AI.</li>
-                 <li>Unggah foto produk yang ingin dipasarkan.</li>
-                 <li>Tunggu proses analisis visual dan penulisan naskah selesai.</li>
-                 <li>Pilih variasi terbaik, lalu salin atau bagikan ke media sosial favorit Anda!</li>
-               </ol>
+              <h4 className="font-semibold text-slate-700 mb-2">Cara Menggunakan</h4>
+              <ol className="list-decimal list-inside space-y-1 leading-relaxed">
+                <li>Klik ikon pengaturan (pojok kanan atas) dan masukkan API Key Kolosal AI.</li>
+                <li>Unggah foto produk yang ingin dipasarkan.</li>
+                <li>Tunggu proses analisis visual dan penulisan naskah selesai.</li>
+                <li>Pilih variasi terbaik, lalu salin atau bagikan ke media sosial favorit Anda!</li>
+              </ol>
             </div>
           </div>
         </div>
 
         <div className="mt-8 text-center space-y-2 pb-8">
-          <p className="text-sm text-gray-400">Powered by Google Gemini 2.5 Flash & Kolosal AI GLM 4.6</p>
+          <p className="text-sm text-gray-400">
+            Powered by Google Gemini 2.5 Flash &amp; Kolosal AI GLM 4.6
+          </p>
           <p className="text-sm font-medium text-slate-500">
-            Credits: Azar & Aunu (NCHMPK)
+            <span className="typing-credit">Credits: Azar &amp; Aunu (NCHMPK)</span>
           </p>
         </div>
       </div>

@@ -60,7 +60,7 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan **Konten Kilat AI** di ling
 
 Pastikan Anda telah menginstal *tools* berikut di mesin Anda:
 
-  * **Node.js** (Versi terbaru)
+  * **Node.js** (Versi 20+ atau diatasnya)
   * **npm** (Biasanya terinstal bersama Node.js)
 
 ### Instalasi Lokal

